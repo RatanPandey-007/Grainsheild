@@ -7,6 +7,9 @@ import NetworkMap from './components/NetworkMap';
 import DashboardHUD from './components/DashboardHUD';
 
 // Default baseline sensors configuration (matches backend coordinates)
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://127.0.0.1:8000/api/v1/ws';
+
 const DEFAULT_SENSORS = [
   { id: 1, node_name: "SILO_01_BOTTOM", x_pos: -4.0, y_pos: 0.8, z_pos: 0.0, status: "NORMAL", telemetry: { temperature: 22.0, humidity: 58.0, moisture: 12.2, gas: 410.0 }, prediction: { risk_score: 12.0, risk_category: "NORMAL", contributing_factors: ["Atmospheric readings are within optimal specifications."], recommended_action: "No action required." } },
   { id: 2, node_name: "SILO_01_MID", x_pos: -4.0, y_pos: 2.5, z_pos: 0.0, status: "NORMAL", telemetry: { temperature: 21.8, humidity: 57.5, moisture: 12.1, gas: 405.0 }, prediction: { risk_score: 11.5, risk_category: "NORMAL", contributing_factors: ["Atmospheric readings are within optimal specifications."], recommended_action: "No action required." } },
@@ -160,7 +163,7 @@ export default function App() {
     }
 
     const connectWS = () => {
-      const socket = new WebSocket('ws://127.0.0.1:8000/api/v1/ws');
+      const socket = new WebSocket(WS_URL);
       wsRef.current = socket;
 
       socket.onopen = () => {
@@ -206,7 +209,7 @@ export default function App() {
   useEffect(() => {
     if (phase !== 'OPERATIONAL') return;
 
-    fetch(`http://127.0.0.1:8000/api/v1/analytics/historical?grain_type=${grainType}`)
+    fetch(`${API_URL}/analytics/historical?grain_type=${grainType}`)
       .then(res => res.json())
       .then(data => {
         setHistoricalData(data);
@@ -241,7 +244,7 @@ export default function App() {
 
     const syncOverride = async () => {
       try {
-        await fetch('http://127.0.0.1:8000/api/v1/simulation', {
+        await fetch(`${API_URL}/simulation`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -355,7 +358,7 @@ export default function App() {
       const runSync = async () => {
         setLogs(prev => [...prev, `[SYNC INITIATED] Uploading ${syncRecords.length} offline cached entries to primary server...`]);
         try {
-          const res = await fetch('http://127.0.0.1:8000/api/v1/sync', {
+          const res = await fetch(`${API_URL}/sync`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(syncRecords)
