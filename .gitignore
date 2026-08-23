@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Production builds
+frontend/dist/
+frontend/build/
+
+# Python cache & environments
+__pycache__/
+backend/app/__pycache__/
+venv/
+.venv/
+env/
+.env
+
+# Database & cached ML models
+*.db
+*.sqlite
+*.pkl
+backend/app/spoilage_model.pkl
+backend/grainshield.db
+grainshield.db
+
+# OS Files
+.DS_Store
+Thumbs.db
